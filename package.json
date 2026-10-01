@@ -1,0 +1,13 @@
+{
+  "name": "dsa-patterns-study",
+  "version": "1.0.0",
+  "description": "DSA Patterns interactive study curriculum and exercises",
+  "type": "module",
+  "scripts": {
+    "test": "node --test exercises/*.test.js",
+    "test:1": "node --test exercises/01-pair-with-target-sum.test.js",
+    "test:2": "node --test exercises/02-squaring-sorted-array.test.js",
+    "test:3": "node --test exercises/03-valid-palindrome.test.js",
+    "test:4": "node --test exercises/04-remove-duplicates.test.js"
+  }
+}

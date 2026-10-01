@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reference: Two Pointers Pattern Cheat Sheet</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    @media print {
+      body {
+        max-width: 100%;
+        padding: 0;
+        font-size: 14px;
+      }
+      .no-print {
+        display: none;
+      }
+      .card {
+        page-break-inside: avoid;
+      }
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+      background: var(--accent-light);
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+    }
+    th {
+      background-color: var(--card-bg);
+      font-family: var(--font-serif);
+      font-weight: 700;
+    }
+    .rule-box {
+      border-left: 4px solid var(--accent-color);
+      padding: 0.8rem 1.2rem;
+      background: var(--card-bg);
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="no-print" style="margin-bottom: 1rem;">
+      <a href="../lessons/0001-two-pointers-introduction.html">&larr; Lesson 1</a> | 
+      <a href="../lessons/0002-two-pointers-practice-lab.html">Lesson 2</a> | 
+      <a href="../lessons/0003-triplet-sum-to-zero.html">Lesson 3</a>
+    </div>
+    <h1>Reference Sheet: Two Pointers Pattern</h1>
+    <div class="meta">
+      <span><span class="badge">Reference Card</span> Compressed Knowledge</span>
+      <span>Target: JavaScript / TypeScript</span>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. Diagnostic Trigger: When to Use Two Pointers</h2>
+      <div class="rule-box">
+        <strong>Identify the pattern when:</strong>
+        <ol>
+          <li>The input array or string is <strong>sorted</strong> (or sorting it costs $O(N \log N)$ which is cheaper than brute force $O(N^2)$ / $O(N^3)$).</li>
+          <li>You are asked to find a <strong>pair, triplet, or subarray</strong> that meets a target sum or constraint.</li>
+          <li>You need to perform an <strong>in-place modification</strong> (e.g. remove duplicates, reverse, partition) with $O(1)$ extra memory.</li>
+          <li>Comparing characters from outer boundaries inward (e.g. palindrome checks).</li>
+        </ol>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. The Three Pointer Archetypes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Variant</th>
+            <th>Starting Positions</th>
+            <th>Movement Rule</th>
+            <th>Canonical Problems</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Converging</strong></td>
+            <td><code>left = 0</code>, <code>right = n - 1</code></td>
+            <td>Pointers move towards each other until <code>left >= right</code></td>
+            <td>Pair with Target Sum, 3Sum, Valid Palindrome, Container With Most Water</td>
+          </tr>
+          <tr>
+            <td><strong>Fast &amp; Slow</strong></td>
+            <td><code>slow = 0</code>, <code>fast = 0</code></td>
+            <td>Both move forward; <code>fast</code> scouts elements, <code>slow</code> writes or marks cycle</td>
+            <td>Remove Duplicates, Move Zeroes, Linked List Cycle</td>
+          </tr>
+          <tr>
+            <td><strong>Opposite / Expanding</strong></td>
+            <td><code>left = center</code>, <code>right = center</code></td>
+            <td>Pointers expand outward from center</td>
+            <td>Longest Palindromic Substring</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. Code Templates (TypeScript / JavaScript)</h2>
+
+      <h3>Archetype A: Converging Pointers (Pair Search)</h3>
+      <pre><code class="language-javascript">function pairWithTargetSum(arr, target) {
+  let left = 0;
+  let right = arr.length - 1;
+
+  while (left < right) {
+    const currentSum = arr[left] + arr[right];
+    if (currentSum === target) {
+      return [left, right];
+    } else if (currentSum < target) {
+      left++;  // Need larger sum
+    } else {
+      right--; // Need smaller sum
+    }
+  }
+  return [-1, -1];
+}</code></pre>
+
+      <h3>Archetype B: Fast &amp; Slow (In-Place Compaction)</h3>
+      <pre><code class="language-javascript">function removeDuplicates(nums) {
+  if (nums.length === 0) return 0;
+  let slow = 0;
+
+  for (let fast = 1; fast < nums.length; fast++) {
+    if (nums[fast] !== nums[slow]) {
+      slow++;
+      nums[slow] = nums[fast];
+    }
+  }
+  return slow + 1; // Length of unique elements
+}</code></pre>
+
+      <h3>Archetype C: Triplet Search with Duplicate Skipping (3Sum)</h3>
+      <pre><code class="language-javascript">function threeSum(nums) {
+  nums.sort((a, b) => a - b);
+  const triplets = [];
+
+  for (let i = 0; i < nums.length - 2; i++) {
+    // Early exit: if smallest element > 0, sum cannot be 0
+    if (nums[i] > 0) break;
+    // Skip duplicate fixed element
+    if (i > 0 && nums[i] === nums[i - 1]) continue;
+
+    let left = i + 1;
+    let right = nums.length - 1;
+
+    while (left < right) {
+      const sum = nums[i] + nums[left] + nums[right];
+      if (sum === 0) {
+        triplets.push([nums[i], nums[left], nums[right]]);
+        // Skip duplicate left and right values
+        while (left < right && nums[left] === nums[left + 1]) left++;
+        while (left < right && nums[right] === nums[right - 1]) right--;
+        left++;
+        right--;
+      } else if (sum < 0) {
+        left++;
+      } else {
+        right--;
+      }
+    }
+  }
+  return triplets;
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>4. Common Pitfalls &amp; Traps</h2>
+      <ul>
+        <li><strong>Forgetting to Sort:</strong> Two pointers relying on monotonic behavior will fail silently on unsorted input. Always confirm if sorting is allowed and how it impacts overall complexity.</li>
+        <li><strong>Infinite Loops on Duplicates:</strong> When advancing past duplicates (<code>while (nums[left] === nums[left + 1]) left++</code>), remember to execute the final <code>left++</code> to land on the new distinct element!</li>
+        <li><strong>Strict Inequality vs Leeway:</strong> Know whether your loop boundary requires <code>left < right</code> (pairs must be distinct indices) or <code>left <= right</code> (pointers may inspect the exact same midpoint or single remaining element).</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. Complexity Cheat Table</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Problem</th>
+            <th>Brute Force</th>
+            <th>Two Pointers</th>
+            <th>Space Complexity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Pair with Target Sum (Sorted)</td>
+            <td>$O(N^2)$</td>
+            <td>$O(N)$</td>
+            <td>$O(1)$</td>
+          </tr>
+          <tr>
+            <td>3Sum (Triplet Sum to Zero)</td>
+            <td>$O(N^3)$</td>
+            <td>$O(N^2)$</td>
+            <td>$O(1)$ aux (or $O(N)$ for sort)</td>
+          </tr>
+          <tr>
+            <td>Squaring Sorted Array</td>
+            <td>$O(N \log N)$ (Square then sort)</td>
+            <td>$O(N)$</td>
+            <td>$O(N)$ output</td>
+          </tr>
+          <tr>
+            <td>Remove Duplicates</td>
+            <td>$O(N^2)$ (Array splice)</td>
+            <td>$O(N)$</td>
+            <td>$O(1)$ in-place</td>
+          </tr>
+          <tr>
+            <td>Trapping Rain Water</td>
+            <td>$O(N^2)$</td>
+            <td>$O(N)$</td>
+            <td>$O(1)$</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <span>DSA Patterns Curriculum</span>
+    <span class="no-print"><a href="javascript:window.print()">Print this cheat sheet (PDF)</a></span>
+  </footer>
+
+</body>
+</html>

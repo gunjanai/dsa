@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 2: Two Pointers Simulation Lab</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    /* Styling for the Simulation Lab */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 1.5rem;
+      gap: 0.5rem;
+    }
+    .tab {
+      padding: 0.6rem 1.2rem;
+      cursor: pointer;
+      font-weight: 600;
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      background-color: transparent;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .tab:hover {
+      color: var(--accent-color);
+      background-color: var(--accent-light);
+    }
+    .tab.active {
+      color: var(--accent-color);
+      border-color: var(--border-color);
+      background-color: var(--bg-color);
+      margin-bottom: -2px;
+      border-bottom: 2px solid var(--bg-color);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .sim-container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .output-array-container {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border-color);
+    }
+    .p-slow {
+      background-color: rgba(147, 112, 219, 0.1);
+      border: 1px solid #9370db;
+      color: #9370db;
+    }
+    .p-fast {
+      background-color: rgba(255, 140, 0, 0.1);
+      border: 1px solid #ff8c00;
+      color: #ff8c00;
+    }
+    .pointer-row {
+      display: flex;
+      justify-content: space-around;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .pointer-row span {
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+    .status-box {
+      background-color: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.8rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      margin-top: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Lesson 2: Two Pointers Simulation Lab</h1>
+    <div class="meta">
+      <span><strong>Difficulty:</strong> <span class="btn-secondary" style="font-size: 0.75rem; padding: 0.15rem 0.4rem; border-radius:4px;">Easy to Medium</span></span>
+      <span><strong>Topic:</strong> Progressive Pointer Tracing</span>
+      <span><strong>Language:</strong> JavaScript / TypeScript</span>
+    </div>
+  </header>
+
+  <main>
+    <p>
+      To master the <strong>Two Pointers Pattern</strong>, you need to see how it bends and adapts to different problems. Some problems use pointers moving towards each other (converging), while others use two pointers moving in the same direction at different speeds (fast/slow runner).
+    </p>
+
+    <!-- Tabs Header -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('squares')">1. Squaring Sorted Array</button>
+      <button class="tab" onclick="switchTab('palindrome')">2. Valid Palindrome</button>
+      <button class="tab" onclick="switchTab('duplicates')">3. Remove Duplicates</button>
+    </div>
+
+    <!-- TAB 1: SQUARING A SORTED ARRAY -->
+    <div id="squares" class="tab-content active">
+      <h2>Simulation 1: Squaring a Sorted Array</h2>
+      <p>
+        <strong>The Problem:</strong> Given an integer array sorted in ascending order, return an array of the squares of each number sorted in ascending order.
+      </p>
+      <div class="card">
+        <strong>Example Input:</strong> <code>nums = [-4, -1, 0, 3, 10]</code><br>
+        <strong>Expected Output:</strong> <code>[0, 1, 9, 16, 100]</code><br>
+        <em>The Trick:</em> Negative numbers square to positive. The largest squares must live at either the extreme left or extreme right. We can build our output backwards!
+      </div>
+
+      <div class="sim-container">
+        <h3>Interactive Visualizer</h3>
+        
+        <div class="pointer-row">
+          <span class="p-left" id="sq-l-lbl">Left (Idx: 0, Val: -4)</span>
+          <span class="p-right" id="sq-r-lbl">Right (Idx: 4, Val: 10)</span>
+          <span class="p-slow" id="sq-w-lbl">Write Head (Idx: 4)</span>
+        </div>
+
+        <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">Input Array:</div>
+        <div class="array-container" id="sq-input-visual"></div>
+
+        <div class="output-array-container">
+          <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">Output Array (Filled Backwards):</div>
+          <div class="array-container" id="sq-output-visual"></div>
+        </div>
+
+        <div class="status-box" id="sq-status">
+          Start stepping to square and sort!
+        </div>
+
+        <div class="sim-controls">
+          <button class="btn btn-secondary" onclick="resetSq()">Reset</button>
+          <button class="btn" id="sq-step-btn" onclick="stepSq()">Next Step &rarr;</button>
+        </div>
+      </div>
+
+      <h3>The Algorithm Explained</h3>
+      <p>
+        Compare <code>Math.abs(nums[left])</code> with <code>Math.abs(nums[right])</code>.
+        Whichever absolute value is larger, square it and write it to the end of your new array, then move that pointer inwards. Repeat until the input pointers meet.
+      </p>
+      <pre><code class="language-javascript">function sortedSquares(nums) {
+    const n = nums.length;
+    const result = new Array(n);
+    let left = 0;
+    let right = n - 1;
+    let writeIdx = n - 1;
+
+    while (left <= right) {
+        const leftVal = Math.abs(nums[left]);
+        const rightVal = Math.abs(nums[right]);
+
+        if (leftVal > rightVal) {
+            result[writeIdx] = leftVal * leftVal;
+            left++;
+        } else {
+            result[writeIdx] = rightVal * rightVal;
+            right--;
+        }
+        writeIdx--;
+    }
+    return result;
+}</code></pre>
+    </div>
+
+    <!-- TAB 2: VALID PALINDROME -->
+    <div id="palindrome" class="tab-content">
+      <h2>Simulation 2: Valid Palindrome</h2>
+      <p>
+        <strong>The Problem:</strong> Check if a string is a palindrome, ignoring non-alphanumeric characters and casing.
+      </p>
+      <div class="card">
+        <strong>Example Input:</strong> <code>"r a c e c a r"</code><br>
+        <strong>Expected Output:</strong> <code>true</code><br>
+        <em>The Trick:</em> Start pointers at both ends. Compare chars. If equal, shift both inwards. If we find any mismatch, we exit immediately with <code>false</code>.
+      </div>
+
+      <div class="sim-container">
+        <h3>Interactive Visualizer</h3>
+
+        <div class="pointer-row">
+          <span class="p-left" id="pal-l-lbl">Left Pointer (Idx: 0, Char: 'r')</span>
+          <span class="p-right" id="pal-r-lbl">Right Pointer (Idx: 6, Char: 'r')</span>
+        </div>
+
+        <div class="array-container" id="pal-visual"></div>
+
+        <div class="status-box" id="pal-status">
+          Click step to verify palindrome character pairs.
+        </div>
+
+        <div class="sim-controls">
+          <button class="btn btn-secondary" onclick="resetPal()">Reset</button>
+          <button class="btn" id="pal-step-btn" onclick="stepPal()">Next Step &rarr;</button>
+        </div>
+      </div>
+
+      <h3>The Algorithm Explained</h3>
+      <p>
+        This is the most straightforward Two Pointers application. By comparing characters from both ends converging to the middle, we get a simple $O(N)$ solution with $O(1)$ extra space.
+      </p>
+      <pre><code class="language-javascript">function isPalindrome(s) {
+    let left = 0;
+    let right = s.length - 1;
+
+    while (left < right) {
+        if (s[left] !== s[right]) {
+            return false; // Mismatch found
+        }
+        left++;
+        right--;
+    }
+    return true; // All pairs matched
+}</code></pre>
+    </div>
+
+    <!-- TAB 3: REMOVE DUPLICATES -->
+    <div id="duplicates" class="tab-content">
+      <h2>Simulation 3: Remove Duplicates from Sorted Array</h2>
+      <p>
+        <strong>The Problem:</strong> Given a sorted array, remove duplicates <strong>in-place</strong> such that each unique element appears only once. Return the length of the deduplicated prefix.
+      </p>
+      <div class="card">
+        <strong>Example Input:</strong> <code>[2, 3, 3, 3, 6, 9]</code><br>
+        <strong>Expected Output Length:</strong> <code>4</code> (Array becomes <code>[2, 3, 6, 9, _, _]</code>)<br>
+        <em>The Trick:</em> This uses the <strong>Fast & Slow Two Pointers</strong> sub-pattern. The <code>fast</code> pointer scans the array, while the <code>slow</code> pointer marks the next slot to write a unique number.
+      </div>
+
+      <div class="sim-container">
+        <h3>Interactive Visualizer</h3>
+
+        <div class="pointer-row">
+          <span class="p-slow" id="dup-s-lbl">Slow Pointer (Idx: 1)</span>
+          <span class="p-fast" id="dup-f-lbl">Fast Pointer (Idx: 1)</span>
+        </div>
+
+        <div class="array-container" id="dup-visual"></div>
+
+        <div class="status-box" id="dup-status">
+          Step to see elements shifted into the unique sub-array prefix.
+        </div>
+
+        <div class="sim-controls">
+          <button class="btn btn-secondary" onclick="resetDup()">Reset</button>
+          <button class="btn" id="dup-step-btn" onclick="stepDup()">Next Step &rarr;</button>
+        </div>
+      </div>
+
+      <h3>The Algorithm Explained</h3>
+      <p>
+        The <code>fast</code> pointer iterates through the array. If the number at <code>fast</code> is different from the number before <code>slow</code>, it means we have found a new unique element. We copy it to index <code>slow</code> and increment <code>slow</code>.
+      </p>
+      <pre><code class="language-javascript">function removeDuplicates(nums) {
+    if (nums.length === 0) return 0;
+    
+    let slow = 1; // Position of the next unique element
+
+    for (let fast = 1; fast < nums.length; fast++) {
+        // Compare with the last unique element placed
+        if (nums[fast] !== nums[slow - 1]) {
+            nums[slow] = nums[fast];
+            slow++;
+        }
+    }
+    return slow; // Length of unique prefix
+}</code></pre>
+    </div>
+
+    <hr>
+
+    <section>
+      <h2>Next Phase: Interactive Verification</h2>
+      <p>
+        These simulations show how different pointers shift relative to each other depending on the problem's objective. 
+      </p>
+      <div class="card">
+        <h3>Verify and Code</h3>
+        <p>
+          Now that you've traced three distinct variations of the Two Pointers pattern, let's write real testable code!
+        </p>
+        <p>
+          Tell me when you are ready, and I will write a <strong>test suite</strong> in your workspace with coding challenges for these three problems.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Mastering DSA Patterns Course</span>
+    <span>Lesson 2 of 16</span>
+  </footer>
+
+  <script>
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase().includes(tabId.substring(0, 3)));
+      if (activeTab) activeTab.classList.add('active');
+      
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // --- SIMULATION 1: SQUARING A SORTED ARRAY ---
+    const sqInput = [-4, -1, 0, 3, 10];
+    let sqL, sqR, sqW;
+    let sqOutput = [];
+    let sqFinished = false;
+
+    function initSq() {
+      sqL = 0;
+      sqR = sqInput.length - 1;
+      sqW = sqInput.length - 1;
+      sqOutput = new Array(sqInput.length).fill(null);
+      sqFinished = false;
+      document.getElementById('sq-step-btn').disabled = false;
+      document.getElementById('sq-step-btn').innerText = 'Next Step \u2192';
+      renderSq();
+    }
+
+    function renderSq() {
+      // Inputs
+      const inputContainer = document.getElementById('sq-input-visual');
+      inputContainer.innerHTML = '';
+      sqInput.forEach((val, idx) => {
+        const box = document.createElement('div');
+        box.className = 'array-box';
+        if (idx === sqL) box.classList.add('active');
+        if (idx === sqR) {
+          box.style.borderColor = '#1e90ff';
+          box.style.backgroundColor = 'rgba(30, 144, 255, 0.05)';
+        }
+        
+        const idxSpan = document.createElement('span');
+        idxSpan.className = 'idx';
+        idxSpan.innerText = idx;
+        box.appendChild(idxSpan);
+
+        const valSpan = document.createElement('span');
+        valSpan.className = 'val';
+        valSpan.innerText = val;
+        box.appendChild(valSpan);
+
+        // Labels
+        if (idx === sqL && idx === sqR) {
+          const l = document.createElement('div');
+          l.className = 'pointer-label';
+          l.style.color = 'purple';
+          l.innerText = 'L & R';
+          box.appendChild(l);
+        } else if (idx === sqL) {
+          const l = document.createElement('div');
+          l.className = 'pointer-label';
+          l.innerText = 'L';
+          box.appendChild(l);
+        } else if (idx === sqR) {
+          const l = document.createElement('div');
+          l.className = 'pointer-label';
+          l.style.color = '#1e90ff';
+          l.innerText = 'R';
+          box.appendChild(l);
+        }
+
+        inputContainer.appendChild(box);
+      });
+
+      // Outputs
+      const outputContainer = document.getElementById('sq-output-visual');
+      outputContainer.innerHTML = '';
+      sqOutput.forEach((val, idx) => {
+        const box = document.createElement('div');
+        box.className = 'array-box';
+        if (idx === sqW && !sqFinished) {
+          box.style.borderColor = '#9370db';
+          box.style.backgroundColor = 'rgba(147, 112, 219, 0.1)';
+        }
+
+        const idxSpan = document.createElement('span');
+        idxSpan.className = 'idx';
+        idxSpan.innerText = idx;
+        box.appendChild(idxSpan);
+
+        const valSpan = document.createElement('span');
+        valSpan.className = 'val';
+        valSpan.innerText = val === null ? '_' : val;
+        box.appendChild(valSpan);
+
+        if (idx === sqW && !sqFinished) {
+          const l = document.createElement('div');
+          l.className = 'pointer-label';
+          l.style.color = '#9370db';
+          l.innerText = 'W';
+          box.appendChild(l);
+        }
+
+        outputContainer.appendChild(box);
+      });
+
+      document.getElementById('sq-l-lbl').innerText = `Left (Idx: ${sqL}, Val: ${sqInput[sqL]})`;
+      document.getElementById('sq-r-lbl').innerText = `Right (Idx: ${sqR}, Val: ${sqInput[sqR]})`;
+      document.getElementById('sq-w-lbl').innerText = `Write Head (Idx: ${sqW})`;
+    }
+
+    function stepSq() {
+      if (sqFinished) return;
+
+      const status = document.getElementById('sq-status');
+      const leftVal = Math.abs(sqInput[sqL]);
+      const rightVal = Math.abs(sqInput[sqR]);
+
+      status.style.color = 'var(--text-color)';
+      
+      if (leftVal > rightVal) {
+        sqOutput[sqW] = leftVal * leftVal;
+        status.innerText = `Compare |${sqInput[sqL]}| = ${leftVal} and |${sqInput[sqR]}| = ${rightVal}. Left absolute value is larger. Square it (${leftVal}^2 = ${leftVal*leftVal}), write to Index ${sqW}, shift left (L++).`;
+        sqL++;
+      } else {
+        sqOutput[sqW] = rightVal * rightVal;
+        status.innerText = `Compare |${sqInput[sqL]}| = ${leftVal} and |${sqInput[sqR]}| = ${rightVal}. Right absolute value is larger. Square it (${rightVal}^2 = ${rightVal*rightVal}), write to Index ${sqW}, shift right (R--).`;
+        sqR--;
+      }
+      sqW--;
+
+      if (sqL > sqR) {
+        sqFinished = true;
+        document.getElementById('sq-step-btn').disabled = true;
+        document.getElementById('sq-step-btn').innerText = 'Complete!';
+        status.innerText = 'Complete! Output is fully populated and correctly sorted!';
+        status.style.color = '#2e7d32';
+      }
+
+      renderSq();
+    }
+
+    function resetSq() { initSq(); }
+
+    // --- SIMULATION 2: VALID PALINDROME ---
+    const palInput = ['r', 'a', 'c', 'e', 'c', 'a', 'r'];
+    let palL, palR;
+    let palFinished = false;
+
+    function initPal() {
+      palL = 0;
+      palR = palInput.length - 1;
+      palFinished = false;
+      document.getElementById('pal-step-btn').disabled = false;
+      document.getElementById('pal-step-btn').innerText = 'Next Step \u2192';
+      renderPal();
+    }
+
+    function renderPal() {
+      const container = document.getElementById('pal-visual');
+      container.innerHTML = '';
+
+      palInput.forEach((val, idx) => {
+        const box = document.createElement('div');
+        box.className = 'array-box';
+        if (idx === palL) box.classList.add('active');
+        if (idx === palR) {
+          box.style.borderColor = '#1e90ff';
+          box.style.backgroundColor = 'rgba(30, 144, 255, 0.05)';
+        }
+
+        const idxSpan = document.createElement('span');
+        idxSpan.className = 'idx';
+        idxSpan.innerText = idx;
+        box.appendChild(idxSpan);
+
+        const valSpan = document.createElement('span');
+        valSpan.className = 'val';
+        valSpan.innerText = `'${val}'`;
+        box.appendChild(valSpan);
+
+        if (idx === palL && idx === palR) {
+          const l = document.createElement('div');
+          l.className = 'pointer-label';
+          l.style.color = 'purple';
+          l.innerText = 'L & R';
+          box.appendChild(l);
+        } else if (idx === palL) {
+          const l = document.createElement('div');
+          l.className = 'pointer-label';
+          l.innerText = 'L';
+          box.appendChild(l);
+        } else if (idx === palR) {
+          const l = document.createElement('div');
+          l.className = 'pointer-label';
+          l.style.color = '#1e90ff';
+          l.innerText = 'R';
+          box.appendChild(l);
+        }
+
+        container.appendChild(box);
+      });
+
+      document.getElementById('pal-l-lbl').innerText = `Left Pointer (Idx: ${palL}, Char: '${palInput[palL]}')`;
+      document.getElementById('pal-r-lbl').innerText = `Right Pointer (Idx: ${palR}, Char: '${palInput[palR]}')`;
+    }
+
+    function stepPal() {
+      if (palFinished) return;
+
+      const status = document.getElementById('pal-status');
+
+      if (palInput[palL] !== palInput[palR]) {
+        status.innerText = `Mismatch! '${palInput[palL]}' !== '${palInput[palR]}'. This string is NOT a palindrome.`;
+        status.style.color = '#c62828';
+        palFinished = true;
+        document.getElementById('pal-step-btn').disabled = true;
+        return;
+      }
+
+      status.innerText = `Character Match: '${palInput[palL]}' === '${palInput[palR]}'. Move both pointers inwards.`;
+      status.style.color = '#2e7d32';
+
+      palL++;
+      palR--;
+
+      if (palL >= palR) {
+        palFinished = true;
+        document.getElementById('pal-step-btn').disabled = true;
+        document.getElementById('pal-step-btn').innerText = 'Valid Palindrome!';
+        status.innerText = 'All matching pairs verified successfully. This string is a valid palindrome!';
+        status.style.color = '#2e7d32';
+      }
+
+      renderPal();
+    }
+
+    function resetPal() { initPal(); }
+
+    // --- SIMULATION 3: REMOVE DUPLICATES ---
+    const dupInput = [2, 3, 3, 3, 6, 9];
+    let dupS, dupF;
+    let dupFinished = false;
+
+    function initDup() {
+      dupS = 1;
+      dupF = 1;
+      dupFinished = false;
+      document.getElementById('dup-step-btn').disabled = false;
+      document.getElementById('dup-step-btn').innerText = 'Next Step \u2192';
+      renderDup();
+    }
+
+    function renderDup() {
+      const container = document.getElementById('dup-visual');
+      container.innerHTML = '';
+
+      dupInput.forEach((val, idx) => {
+        const box = document.createElement('div');
+        box.className = 'array-box';
+        
+        // Active coloring
+        if (idx < dupS) {
+          box.style.borderColor = '#2e7d32';
+          box.style.backgroundColor = 'rgba(46, 125, 50, 0.05)';
+        }
+
+        const idxSpan = document.createElement('span');
+        idxSpan.className = 'idx';
+        idxSpan.innerText = idx;
+        box.appendChild(idxSpan);
+
+        const valSpan = document.createElement('span');
+        valSpan.className = 'val';
+        valSpan.innerText = val;
+        box.appendChild(valSpan);
+
+        // Labels
+        if (idx === dupS && idx === dupF) {
+          const l = document.createElement('div');
+          l.className = 'pointer-label';
+          l.style.color = 'purple';
+          l.innerText = 'S & F';
+          box.appendChild(l);
+        } else if (idx === dupS) {
+          const l = document.createElement('div');
+          l.className = 'pointer-label';
+          l.style.color = '#9370db';
+          l.innerText = 'S';
+          box.appendChild(l);
+        } else if (idx === dupF) {
+          const l = document.createElement('div');
+          l.className = 'pointer-label';
+          l.style.color = '#ff8c00';
+          l.innerText = 'F';
+          box.appendChild(l);
+        }
+
+        container.appendChild(box);
+      });
+
+      document.getElementById('dup-s-lbl').innerText = `Slow Pointer (Idx: ${dupS})`;
+      document.getElementById('dup-f-lbl').innerText = `Fast Pointer (Idx: ${dupF})`;
+    }
+
+    function stepDup() {
+      if (dupFinished) return;
+
+      const status = document.getElementById('dup-status');
+      status.style.color = 'var(--text-color)';
+
+      const currentVal = dupInput[dupF];
+      const previousUniqueVal = dupInput[dupS - 1];
+
+      if (currentVal !== previousUniqueVal) {
+        dupInput[dupS] = currentVal;
+        status.innerText = `Unique value found! ${currentVal} is different from previous unique ${previousUniqueVal}. Copy ${currentVal} to Index ${dupS} (Slow), and advance Slow.`;
+        status.style.color = '#2e7d32';
+        dupS++;
+      } else {
+        status.innerText = `Duplicate detected! Value ${currentVal} matches previous unique ${previousUniqueVal}. Skip copying. Fast pointer advances.`;
+        status.style.color = 'var(--text-muted)';
+      }
+
+      dupF++;
+
+      if (dupF >= dupInput.length) {
+        dupFinished = true;
+        document.getElementById('dup-step-btn').disabled = true;
+        document.getElementById('dup-step-btn').innerText = 'Complete!';
+        status.innerText = `All elements scanned! The first ${dupS} elements [${dupInput.slice(0, dupS).join(', ')}] are the unique elements. Return length = ${dupS}.`;
+        status.style.color = '#2e7d32';
+      }
+
+      renderDup();
+    }
+
+    function resetDup() {
+      // Restore input array
+      dupInput[0] = 2; dupInput[1] = 3; dupInput[2] = 3;
+      dupInput[3] = 3; dupInput[4] = 6; dupInput[5] = 9;
+      initDup();
+    }
+
+    // Initialize all visualizers
+    initSq();
+    initPal();
+    initDup();
+  </script>
+</body>
+</html>

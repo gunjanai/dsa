@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 3: Triplet Sum to Zero (3Sum)</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .badge-medium {
+      background-color: #fff3e0;
+      color: #e65100;
+      border: 1px solid #ffb74d;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+    }
+    .pointer-info {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.88rem;
+      font-family: var(--font-mono);
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .p-fixed {
+      background-color: rgba(156, 39, 176, 0.1);
+      border: 1px solid #9c27b0;
+      color: #9c27b0;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .p-left {
+      background-color: var(--accent-light);
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .p-right {
+      background-color: rgba(30, 144, 255, 0.1);
+      border: 1px solid #1e90ff;
+      color: #1e90ff;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .status-panel {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      background-color: var(--code-bg);
+      padding: 0.8rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+      border: 1px dashed var(--border-color);
+      text-align: center;
+    }
+    .triplet-list {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+    }
+    .triplet-tag {
+      background-color: rgba(46, 125, 50, 0.15);
+      border: 1px solid #2e7d32;
+      color: #2e7d32;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .sim-controls {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    .nav-links {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+    .callout {
+      background-color: var(--card-bg);
+      border-left: 4px solid var(--accent-color);
+      padding: 1rem;
+      margin: 1.5rem 0;
+      border-radius: 0 6px 6px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-links">
+      <a href="./0002-two-pointers-practice-lab.html">&larr; Lesson 2: Simulation Lab</a>
+      <a href="../reference/two-pointers-cheatsheet.html">Cheat Sheet Reference &rarr;</a>
+    </div>
+    <h1>Lesson 3: Triplet Sum to Zero (3Sum)</h1>
+    <div class="meta">
+      <span><strong>Difficulty:</strong> <span class="badge badge-medium">Medium</span></span>
+      <span><strong>Pattern:</strong> Two Pointers (Fixed Pivot + Converging)</span>
+      <span><strong>LeetCode:</strong> #15</span>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>The Milestone: Stepping into Medium Difficulty</h2>
+      <p>
+        In <a href="./0001-two-pointers-introduction.html">Lesson 1</a>, we learned how two converging pointers find a pair in $O(N)$ time on a <strong>sorted</strong> array.
+      </p>
+      <p>
+        Now, what happens if we need <strong>three numbers</strong> that add up to zero?
+      </p>
+
+      <div class="card">
+        <strong>Problem Statement (LeetCode 15):</strong><br>
+        Given an integer array <code>nums</code>, return all the unique triplets <code>[nums[i], nums[j], nums[k]]</code> such that:
+        <br>
+        <code>i != j</code>, <code>i != k</code>, <code>j != k</code>, and <code>nums[i] + nums[j] + nums[k] === 0</code>.<br>
+        <em>Note: The solution set must not contain duplicate triplets.</em>
+      </div>
+
+      <div class="callout">
+        <strong>The Key Insight:</strong><br>
+        <code>nums[i] + nums[left] + nums[right] === 0</code> is algebraically identical to:
+        <br>
+        <code>nums[left] + nums[right] === -nums[i]</code>.
+        <br>
+        By <strong>fixing one number</strong> (<code>nums[i]</code>), the problem transforms directly back into <em>Pair with Target Sum</em>!
+      </div>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>Why Brute Force Fails</h2>
+      <p>
+        Checking every possible combination of three indices with three nested loops requires $O(N^3)$ operations. For $N = 3,000$, $N^3$ is $2.7 \times 10^{10}$ operations—guaranteeing a <em>Time Limit Exceeded</em> failure.
+      </p>
+      <p>
+        Instead:
+      </p>
+      <ol>
+        <li><strong>Sort the array first:</strong> Costs $O(N \log N)$. Sorting organizes numbers monotonically.</li>
+        <li><strong>Fix one element at a time (index <code>i</code>):</strong> Iterate <code>i</code> from <code>0</code> to <code>nums.length - 3</code>.</li>
+        <li><strong>Run Two Pointers on the remaining slice:</strong> Set <code>left = i + 1</code> and <code>right = nums.length - 1</code>. Searching for the pair takes $O(N)$.</li>
+      </ol>
+      <p>
+        Doing an $O(N)$ two-pointer scan for each of the $N$ elements produces an overall runtime of $O(N \log N + N^2) = \mathbf{O(N^2)}$, which comfortably passes within milliseconds!
+      </p>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>Interactive Simulation: 3Sum Step-by-Step</h2>
+      <p>
+        Step through the execution below with sorted array <code>[-4, -1, -1, 0, 1, 2]</code>. Watch how the fixed pivot <code>i</code> works with <code>left</code> and <code>right</code>, and how duplicate values are skipped cleanly.
+      </p>
+
+      <div class="visualizer">
+        <div class="pointer-info">
+          <span class="p-fixed" id="sim-i-lbl">Fixed i: Index 0 (Val: -4)</span>
+          <span class="p-left" id="sim-l-lbl">Left: Index 1 (Val: -1)</span>
+          <span class="p-right" id="sim-r-lbl">Right: Index 5 (Val: 2)</span>
+        </div>
+
+        <div class="array-container" id="array-display">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="status-panel">
+          Current Sum: <span id="sum-formula">-4 + (-1) + 2 = -3</span> | Target: <strong>0</strong><br>
+          <span id="decision-text" style="color: var(--accent-color); font-weight: bold; margin-top: 5px; display: inline-block;">
+            Click "Next Step" to start tracing!
+          </span>
+        </div>
+
+        <div style="text-align: center; font-size: 0.9rem; margin-top: 0.5rem;">
+          <strong>Found Triplets:</strong>
+          <div class="triplet-list" id="triplet-box">
+            <span style="color: var(--text-muted);">(None found yet)</span>
+          </div>
+        </div>
+
+        <div class="sim-controls">
+          <button class="btn btn-secondary" onclick="resetSim()">Reset</button>
+          <button class="btn" id="next-btn" onclick="stepSim()">Next Step &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>Handling Duplicates: The Interviewer's Trap</h2>
+      <p>
+        The hardest part of 3Sum isn't the two pointers—it is avoiding duplicate triplets without wasting memory on huge HashSets.
+      </p>
+      <p>
+        There are two places duplicate values can occur:
+      </p>
+      <ul>
+        <li>
+          <strong>Duplicate fixed element (<code>nums[i]</code>):</strong>
+          If <code>nums[i] === nums[i - 1]</code>, we have already found all valid triplets containing that value at index <code>i - 1</code>. We must <code>continue</code> to skip it.
+        </li>
+        <li>
+          <strong>Duplicate pointer values (<code>nums[left]</code> &amp; <code>nums[right]</code>):</strong>
+          Once a valid triplet is found, we must advance <code>left</code> past all identical values (<code>nums[left] === nums[left + 1]</code>) and decrement <code>right</code> past all identical values (<code>nums[right] === nums[right - 1]</code>).
+        </li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>Clean JavaScript / TypeScript Solution</h2>
+      <pre><code class="language-javascript">/**
+ * Finds all unique triplets summing to zero.
+ * Time Complexity: O(N^2)
+ * Space Complexity: O(1) auxiliary (excluding output)
+ */
+function threeSum(nums) {
+  nums.sort((a, b) => a - b);
+  const result = [];
+
+  for (let i = 0; i < nums.length - 2; i++) {
+    // Optimization: if current number > 0, three positive numbers cannot sum to 0
+    if (nums[i] > 0) break;
+
+    // Skip duplicate fixed numbers
+    if (i > 0 && nums[i] === nums[i - 1]) continue;
+
+    let left = i + 1;
+    let right = nums.length - 1;
+
+    while (left < right) {
+      const sum = nums[i] + nums[left] + nums[right];
+
+      if (sum === 0) {
+        result.push([nums[i], nums[left], nums[right]]);
+
+        // Skip duplicate left values
+        while (left < right && nums[left] === nums[left + 1]) left++;
+        // Skip duplicate right values
+        while (left < right && nums[right] === nums[right - 1]) right--;
+
+        left++;
+        right--;
+      } else if (sum < 0) {
+        left++; // Need larger sum
+      } else {
+        right--; // Need smaller sum
+      }
+    }
+  }
+
+  return result;
+}</code></pre>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>Check Your Understanding</h2>
+      <p>Test your intuition on the nuances of 3Sum:</p>
+
+      <div class="quiz-container">
+        <!-- Question 1: Exactly 6 words per option -->
+        <div class="card">
+          <div class="quiz-question">1. Why does 3Sum require sorting the input array before applying two pointers?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1')">Sorting ensures duplicate triplets are impossible.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1')">Directional pointer movement requires sorted order.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1')">Sorting reduces overall memory usage drastically.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1')">JavaScript requires sorted arrays for comparisons.</div>
+          </div>
+          <div class="feedback" id="q1-feedback"></div>
+        </div>
+
+        <!-- Question 2: Exactly 5 words per option -->
+        <div class="card" style="margin-top: 1.5rem;">
+          <div class="quiz-question">2. When <code>nums[i] > 0</code> in the outer loop, why can we safely break early?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2')">Positive numbers cannot sum zero.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2')">The array ends right there.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2')">Negative values appear much later.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2')">Zero is not in array.</div>
+          </div>
+          <div class="feedback" id="q2-feedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>Recommended Primary Source</h2>
+      <p>
+        Watch NeetCode's comprehensive video explanation of 3Sum for dynamic visual animations of pointer traversal and edge case management:
+      </p>
+      <p>
+        📺 <a href="https://neetcode.io/problems/three-integer-sum" target="_blank" rel="noopener noreferrer">NeetCode: 3Sum Visual Explanation and Code Walkthrough</a>
+      </p>
+    </section>
+
+    <div class="callout" style="border-left-color: #2e7d32;">
+      <strong>Teacher Check-in:</strong><br>
+      Did the duplicate-skipping logic make sense, or would you like to trace an example where <code>nums[i]</code> has three identical values (like <code>[0, 0, 0]</code>)?
+      <br>
+      Feel free to ask questions or share your solution directly in chat!
+    </div>
+  </main>
+
+  <footer>
+    <span>DSA Patterns &bull; Lesson 3</span>
+    <span><a href="./0002-two-pointers-practice-lab.html">Back to Lab</a> | <a href="../reference/two-pointers-cheatsheet.html">Reference</a></span>
+  </footer>
+
+  <script>
+    const nums = [-4, -1, -1, 0, 1, 2];
+    let i = 0;
+    let left = 1;
+    let right = 5;
+    let stage = 0; // step counter for script
+    const triplets = [];
+
+    const traceSteps = [
+      { i: 0, l: 1, r: 5, text: "Fixed i=0 (-4). Left=1 (-1), Right=5 (2). Sum = -4 + -1 + 2 = -3 < 0. Advance left.", lDelta: 1, rDelta: 0 },
+      { i: 0, l: 2, r: 5, text: "Fixed i=0 (-4). Left=2 (-1), Right=5 (2). Sum = -4 + -1 + 2 = -3 < 0. Advance left.", lDelta: 1, rDelta: 0 },
+      { i: 0, l: 3, r: 5, text: "Fixed i=0 (-4). Left=3 (0), Right=5 (2). Sum = -4 + 0 + 2 = -2 < 0. Advance left.", lDelta: 1, rDelta: 0 },
+      { i: 0, l: 4, r: 5, text: "Fixed i=0 (-4). Left=4 (1), Right=5 (2). Sum = -4 + 1 + 2 = -1 < 0. Advance left.", lDelta: 1, rDelta: 0 },
+      { i: 0, l: 5, r: 5, text: "Pointers met (left == right). No triplet found for i=0. Advance fixed pivot i.", iDelta: 1, nextI: 1, nextL: 2, nextR: 5 },
+      { i: 1, l: 2, r: 5, text: "Fixed i=1 (-1). Left=2 (-1), Right=5 (2). Sum = -1 + -1 + 2 = 0! MATCH FOUND! Push [-1, -1, 2].", found: [-1, -1, 2], lDelta: 1, rDelta: -1 },
+      { i: 1, l: 3, r: 4, text: "Fixed i=1 (-1). Left=3 (0), Right=4 (1). Sum = -1 + 0 + 1 = 0! MATCH FOUND! Push [-1, 0, 1].", found: [-1, 0, 1], lDelta: 1, rDelta: -1 },
+      { i: 1, l: 4, r: 3, text: "Pointers crossed (left > right). Done for i=1. Next i=2 has value -1 (duplicate of i=1)! Skip it.", skipDup: true },
+      { i: 3, l: 4, r: 5, text: "Fixed i=3 (0). Left=4 (1), Right=5 (2). Sum = 0 + 1 + 2 = 3 > 0. Decrement right.", rDelta: -1 },
+      { i: 3, l: 4, r: 4, text: "Pointers met. Loop finished! Found all unique triplets without duplicates.", finished: true }
+    ];
+
+    let currentStepIdx = 0;
+
+    function renderArray() {
+      const container = document.getElementById('array-display');
+      container.innerHTML = '';
+      nums.forEach((val, idx) => {
+        const box = document.createElement('div');
+        box.className = 'array-box';
+        
+        let label = '';
+        if (idx === i) {
+          box.classList.add('active');
+          label = 'i';
+        }
+        if (idx === left) {
+          box.style.borderColor = 'var(--accent-color)';
+          box.style.backgroundColor = 'var(--accent-light)';
+          label = label ? label + ',L' : 'L';
+        }
+        if (idx === right) {
+          box.style.borderColor = '#1e90ff';
+          box.style.backgroundColor = 'rgba(30, 144, 255, 0.1)';
+          label = label ? label + ',R' : 'R';
+        }
+
+        if (label) {
+          const lblEl = document.createElement('span');
+          lblEl.className = 'pointer-label';
+          lblEl.textContent = label;
+          box.appendChild(lblEl);
+        }
+
+        const valSpan = document.createElement('span');
+        valSpan.className = 'val';
+        valSpan.textContent = val;
+        box.appendChild(valSpan);
+
+        const idxSpan = document.createElement('span');
+        idxSpan.className = 'idx';
+        idxSpan.textContent = idx;
+        box.appendChild(idxSpan);
+
+        container.appendChild(box);
+      });
+
+      document.getElementById('sim-i-lbl').textContent = `Fixed i: Index ${i} (Val: ${nums[i] !== undefined ? nums[i] : '-'})`;
+      document.getElementById('sim-l-lbl').textContent = `Left: Index ${left} (Val: ${nums[left] !== undefined ? nums[left] : '-'})`;
+      document.getElementById('sim-r-lbl').textContent = `Right: Index ${right} (Val: ${nums[right] !== undefined ? nums[right] : '-'})`;
+      
+      if (nums[i] !== undefined && nums[left] !== undefined && nums[right] !== undefined) {
+        const s = nums[i] + nums[left] + nums[right];
+        document.getElementById('sum-formula').textContent = `${nums[i]} + ${nums[left]} + ${nums[right]} = ${s}`;
+      }
+    }
+
+    function stepSim() {
+      if (currentStepIdx >= traceSteps.length) {
+        document.getElementById('decision-text').textContent = "Simulation completed! Click 'Reset' to replay.";
+        document.getElementById('next-btn').disabled = true;
+        return;
+      }
+
+      const st = traceSteps[currentStepIdx];
+      i = st.i;
+      left = st.l;
+      right = st.r;
+      document.getElementById('decision-text').textContent = st.text;
+
+      if (st.found) {
+        triplets.push(st.found);
+        const tBox = document.getElementById('triplet-box');
+        if (triplets.length === 1) tBox.innerHTML = '';
+        const tag = document.createElement('span');
+        tag.className = 'triplet-tag';
+        tag.textContent = `[${st.found.join(', ')}]`;
+        tBox.appendChild(tag);
+      }
+
+      renderArray();
+      currentStepIdx++;
+    }
+
+    function resetSim() {
+      i = 0;
+      left = 1;
+      right = 5;
+      currentStepIdx = 0;
+      triplets.length = 0;
+      document.getElementById('triplet-box').innerHTML = '<span style="color: var(--text-muted);">(None found yet)</span>';
+      document.getElementById('decision-text').textContent = "Click 'Next Step' to trace 3Sum.";
+      document.getElementById('next-btn').disabled = false;
+      renderArray();
+    }
+
+    function checkAnswer(el, isCorrect, qId) {
+      const options = el.parentElement.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+
+      const feedback = document.getElementById(qId + '-feedback');
+      feedback.classList.remove('show', 'correct-feedback', 'incorrect-feedback');
+
+      if (isCorrect) {
+        el.classList.add('correct');
+        feedback.classList.add('show', 'correct-feedback');
+        feedback.innerHTML = "<strong>Correct!</strong> In order to decide whether to move <code>left</code> (increase sum) or <code>right</code> (decrease sum), the values must change monotonically.";
+      } else {
+        el.classList.add('incorrect');
+        feedback.classList.add('show', 'incorrect-feedback');
+        feedback.innerHTML = "<strong>Not quite.</strong> Remember: without sorted order, moving left or right does not guarantee whether the sum grows or shrinks.";
+      }
+    }
+
+    // Initial render
+    renderArray();
+  </script>
+</body>
+</html>

@@ -1,0 +1,326 @@
+/* assets/style.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg-color: #fffffb; /* warm off-white */
+  --text-color: #111111;
+  --text-muted: #666666;
+  --accent-color: #aa2211; /* classic warm red */
+  --accent-light: #fdf6f0;
+  --border-color: #e0dcd3;
+  --code-bg: #f5f3eb;
+  --card-bg: #faf7f0;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --max-width: 760px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #121214;
+    --text-color: #e3e3e6;
+    --text-muted: #a0a0a5;
+    --accent-color: #ff6b6b;
+    --accent-light: #251c1c;
+    --border-color: #2e2e33;
+    --code-bg: #1a1a1e;
+    --card-bg: #161619;
+  }
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-sans);
+  line-height: 1.62;
+  font-size: 17px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+  color: var(--text-color);
+}
+
+h1 {
+  font-size: 2.4rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  margin-top: 1rem;
+}
+
+h2 {
+  font-size: 1.7rem;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 0.3rem;
+}
+
+h3 {
+  font-size: 1.3rem;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+a:hover {
+  border-bottom-color: var(--accent-color);
+}
+
+em {
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+strong {
+  font-weight: 700;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background-color: var(--code-bg);
+  padding: 0.15rem 0.3rem;
+  border-radius: 4px;
+}
+
+pre {
+  background-color: var(--code-bg);
+  padding: 1.2rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
+blockquote {
+  margin: 1.5rem 0;
+  padding: 0.5rem 1.2rem;
+  border-left: 3px solid var(--accent-color);
+  background-color: var(--accent-light);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 2.5rem 0;
+}
+
+/* UI Card, Quiz & Simulator Components */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.quiz-container {
+  margin: 1.5rem 0;
+}
+
+.quiz-question {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.quiz-option {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.quiz-option:hover {
+  border-color: var(--accent-color);
+  background-color: var(--accent-light);
+}
+
+.quiz-option.correct {
+  border-color: #2e7d32;
+  background-color: rgba(46, 125, 50, 0.05);
+}
+
+.quiz-option.incorrect {
+  border-color: #c62828;
+  background-color: rgba(198, 40, 40, 0.05);
+}
+
+.feedback {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  display: none;
+  padding: 0.8rem;
+  border-radius: 6px;
+}
+
+.feedback.show {
+  display: block;
+}
+
+.feedback.correct-feedback {
+  background-color: rgba(46, 125, 50, 0.1);
+  border-left: 4px solid #2e7d32;
+}
+
+.feedback.incorrect-feedback {
+  background-color: rgba(198, 40, 40, 0.1);
+  border-left: 4px solid #c62828;
+}
+
+/* Header & Navigation Utilities */
+header {
+  margin-bottom: 3rem;
+}
+
+header .meta {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 1.5rem;
+}
+
+footer {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Visualization widgets */
+.visualizer {
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.array-container {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.array-box {
+  width: 45px;
+  height: 45px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  background-color: var(--bg-color);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.array-box .val {
+  font-size: 1.1rem;
+}
+
+.array-box .idx {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  position: absolute;
+  bottom: 2px;
+}
+
+.array-box.active {
+  border-color: var(--accent-color);
+  background-color: var(--accent-light);
+  transform: scale(1.05);
+}
+
+.array-box.found {
+  border-color: #2e7d32;
+  background-color: rgba(46, 125, 50, 0.08);
+}
+
+.pointer-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  position: absolute;
+  top: -20px;
+}
+
+/* Utility buttons */
+.btn {
+  background-color: var(--accent-color);
+  color: white !important;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: inline-block;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  border-color: transparent;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-color) !important;
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--code-bg);
+}

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 1: Two Pointers Introduction</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    /* Custom additions for pointer visualization */
+    .sim-controls {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    .status-panel {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      background-color: var(--code-bg);
+      padding: 0.8rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+      border: 1px dashed var(--border-color);
+      text-align: center;
+    }
+    .pointer-info {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .pointer-info span {
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+    .p-left {
+      background-color: var(--accent-light);
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+    }
+    .p-right {
+      background-color: rgba(30, 144, 255, 0.1);
+      border: 1px solid #1e90ff;
+      color: #1e90ff;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.1rem 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+    }
+    .badge-easy {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Lesson 1: Mastering the Two Pointers Pattern</h1>
+    <div class="meta">
+      <span><strong>Difficulty:</strong> <span class="badge badge-easy">Easy</span></span>
+      <span><strong>Topic:</strong> Array / Linear Search Optimization</span>
+      <span><strong>Language:</strong> JavaScript / TypeScript</span>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>The Core Concept: Converging Pointers</h2>
+      <p>
+        Imagine you are given a <strong>sorted</strong> array of integers and asked to find two numbers that add up to a specific <code>target</code> sum.
+      </p>
+      
+      <div class="card">
+        <strong>Problem: Pair with Target Sum</strong><br>
+        <strong>Input:</strong> <code>nums = [1, 2, 4, 6, 8, 10, 13]</code>, <code>target = 14</code><br>
+        <strong>Output:</strong> <code>[2, 5]</code> (Indices of numbers <code>4</code> and <code>10</code> which sum to <code>14</code>)
+      </div>
+
+      <h3>Why not check every pair? (The Brute Force Approach)</h3>
+      <p>
+        If we use a nested loop to check every possible pair of elements, we will perform $O(N^2)$ operations. For an array of size $10^5$, this would require $10^{10}$ comparisons, which will crash or timeout in an interview.
+      </p>
+      <p>
+        But wait! The array is <strong>sorted</strong>. This sorted property is a massive hint that we can do much better.
+      </p>
+
+      <h3>How Two Pointers Optimizes This</h3>
+      <p>
+        We place one pointer (<code>left</code>) at the very beginning (index <code>0</code>) and another pointer (<code>right</code>) at the very end (index <code>nums.length - 1</code>).
+      </p>
+      <blockquote>
+        At each step, we calculate the sum of the elements at these two pointers: <code>currentSum = nums[left] + nums[right]</code>.
+      </blockquote>
+      <ul>
+        <li>If <code>currentSum === target</code>: We found the pair! Return their indices.</li>
+        <li>If <code>currentSum &lt; target</code>: The sum is too small. Since the array is sorted, the only way to increase the sum is to move the <code>left</code> pointer to the right (<code>left++</code>).</li>
+        <li>If <code>currentSum &gt; target</code>: The sum is too large. The only way to decrease the sum is to move the <code>right</code> pointer to the left (<code>right--</code>).</li>
+      </ul>
+      <p>
+        Because we move at least one pointer in each step, we traverse the array at most once, achieving a lightning-fast <strong>$O(N)$ Time Complexity</strong> and <strong>$O(1)$ Space Complexity</strong>.
+      </p>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>Interactive Simulation</h2>
+      <p>
+        Interact with the visualizer below to see how the pointers move step-by-step for the array <code>[1, 2, 4, 6, 8, 10, 13]</code> and <code>target = 14</code>.
+      </p>
+
+      <div class="visualizer">
+        <div class="pointer-info">
+          <span class="p-left">Left Pointer (Index: <span id="idx-left-val">0</span>, Val: <span id="num-left-val">1</span>)</span>
+          <span class="p-right">Right Pointer (Index: <span id="idx-right-val">6</span>, Val: <span id="num-right-val">13</span>)</span>
+        </div>
+
+        <div class="array-container" id="array-visual">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="status-panel">
+          Current Sum: <span id="curr-sum">1 + 13 = 14</span> | Target: <strong>14</strong><br>
+          <span id="decision-text" style="color: var(--accent-color); font-weight: bold; margin-top: 5px; display: inline-block;">Start the simulation below!</span>
+        </div>
+
+        <div class="sim-controls">
+          <button class="btn btn-secondary" onclick="resetSim()">Reset</button>
+          <button class="btn" id="step-btn" onclick="nextStep()">Next Step &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>The JavaScript Implementation</h2>
+      <p>
+        Here is the clean, idiomatic ES6 JavaScript implementation of the Two Pointers approach:
+      </p>
+
+      <pre><code class="language-javascript">/**
+ * Finds two indices in a sorted array that sum up to target.
+ * Time Complexity: O(N)
+ * Space Complexity: O(1)
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]} [leftIndex, rightIndex] or []
+ */
+function pairWithTargetSum(nums, target) {
+    let left = 0;
+    let right = nums.length - 1;
+
+    while (left < right) {
+        const currentSum = nums[left] + nums[right];
+
+        if (currentSum === target) {
+            return [left, right]; // Found the pair!
+        } else if (currentSum < target) {
+            left++; // Need a larger sum
+        } else {
+            right--; // Need a smaller sum
+        }
+    }
+
+    return []; // No pair found
+}</code></pre>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>Quick Retrieval Quiz</h2>
+      <p>
+        Let's reinforce what we've learned to lock this into long-term memory.
+      </p>
+
+      <div class="quiz-container">
+        <div class="quiz-question">
+          1. Why does the Two Pointers pattern require the array to be sorted for this problem?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="checkQuiz(1, 0, this)">
+            A) Because the while-loop condition 'left &lt; right' only works on sorted elements.
+          </div>
+          <div class="quiz-option" onclick="checkQuiz(1, 1, this)">
+            B) Because sorting allows us to confidently know whether moving a pointer increases or decreases the sum.
+          </div>
+          <div class="quiz-option" onclick="checkQuiz(1, 2, this)">
+            C) Because JavaScript arrays must be sorted before performing any operations on them.
+          </div>
+        </div>
+        <div class="feedback" id="quiz-1-feedback"></div>
+      </div>
+
+      <div class="quiz-container" style="margin-top: 2rem;">
+        <div class="quiz-question">
+          2. What is the Space Complexity of the Two Pointers solution?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="checkQuiz(2, 0, this)">
+            A) O(N) because we might have to traverse all N elements in the array.
+          </div>
+          <div class="quiz-option" onclick="checkQuiz(2, 1, this)">
+            B) O(log N) because the pointers converge in a binary search-like fashion.
+          </div>
+          <div class="quiz-option" onclick="checkQuiz(2, 2, this)">
+            C) O(1) because we only use a constant amount of extra space (two pointer variables).
+          </div>
+        </div>
+        <div class="feedback" id="quiz-2-feedback"></div>
+      </div>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>Next Steps & Actionable Practice</h2>
+      <p>
+        Now it's time to build hands-on programming muscle. 
+      </p>
+      <div class="card">
+        <h3>Your Coding Challenge</h3>
+        <p>
+          I have set up a scratch workspace directory for you. Let's write the <code>pairWithTargetSum</code> function and run local tests to verify your implementation!
+        </p>
+        <p>
+          <strong>Step 1:</strong> Ask me to create your first coding challenge file in the workspace.<br>
+          <strong>Step 2:</strong> Implement the function and let's run the tests together.<br>
+          <strong>Step 3:</strong> Once we verify this basic problem, we will solve <strong>Medium</strong> questions, and then proceed directly to <strong>Hard</strong> questions.
+        </p>
+      </div>
+
+      <p>
+        <em>Primary Source Citation:</em> This pattern is analyzed in detail at <a href="https://www.designgurus.io/course-play/grokking-the-coding-interview/doc/636b04297b4ec8efcf5df676" target="_blank">Grokking the Coding Interview (DesignGurus)</a> and <a href="https://neetcode.io/practice" target="_blank">NeetCode Practice Roadmap</a>.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <span>Mastering DSA Patterns Course</span>
+    <span>Lesson 1 of 16</span>
+  </footer>
+
+  <script>
+    // Simulator Code
+    const nums = [1, 2, 4, 6, 8, 10, 13];
+    const target = 14;
+    let left = 0;
+    let right = nums.length - 1;
+    let stepCount = 0;
+    let isFinished = false;
+
+    function renderArray() {
+      const container = document.getElementById('array-visual');
+      container.innerHTML = '';
+      
+      nums.forEach((val, idx) => {
+        const box = document.createElement('div');
+        box.className = 'array-box';
+        
+        // Add indices
+        const idxSpan = document.createElement('span');
+        idxSpan.className = 'idx';
+        idxSpan.innerText = idx;
+        box.appendChild(idxSpan);
+        
+        // Add values
+        const valSpan = document.createElement('span');
+        valSpan.className = 'val';
+        valSpan.innerText = val;
+        box.appendChild(valSpan);
+        
+        // Pointers highlight
+        if (idx === left && idx === right) {
+          box.style.borderColor = 'purple';
+          box.style.backgroundColor = 'rgba(128, 0, 128, 0.1)';
+          
+          const label = document.createElement('div');
+          label.className = 'pointer-label';
+          label.style.color = 'purple';
+          label.innerText = 'L & R';
+          box.appendChild(label);
+        } else if (idx === left) {
+          box.classList.add('active');
+          const label = document.createElement('div');
+          label.className = 'pointer-label';
+          label.innerText = 'L';
+          box.appendChild(label);
+        } else if (idx === right) {
+          box.style.borderColor = '#1e90ff';
+          box.style.backgroundColor = 'rgba(30, 144, 255, 0.1)';
+          const label = document.createElement('div');
+          label.className = 'pointer-label';
+          label.style.color = '#1e90ff';
+          label.innerText = 'R';
+          box.appendChild(label);
+        }
+        
+        container.appendChild(box);
+      });
+
+      // Update control text
+      document.getElementById('idx-left-val').innerText = left;
+      document.getElementById('num-left-val').innerText = nums[left];
+      document.getElementById('idx-right-val').innerText = right;
+      document.getElementById('num-right-val').innerText = nums[right];
+      
+      const currentSum = nums[left] + nums[right];
+      document.getElementById('curr-sum').innerText = `${nums[left]} + ${nums[right]} = ${currentSum}`;
+    }
+
+    function resetSim() {
+      left = 0;
+      right = nums.length - 1;
+      stepCount = 0;
+      isFinished = false;
+      document.getElementById('step-btn').disabled = false;
+      document.getElementById('step-btn').innerText = 'Next Step \u2192';
+      document.getElementById('decision-text').innerText = 'Pointers reset! Ready to step.';
+      document.getElementById('decision-text').style.color = 'var(--text-color)';
+      renderArray();
+    }
+
+    function nextStep() {
+      if (isFinished) return;
+      
+      const currentSum = nums[left] + nums[right];
+      const decisionText = document.getElementById('decision-text');
+      
+      if (currentSum === target) {
+        decisionText.innerText = `Success! Sum ${currentSum} is equal to Target ${target}. We return index [${left}, ${right}] (Values: ${nums[left]} and ${nums[right]}).`;
+        decisionText.style.color = '#2e7d32';
+        document.getElementById('step-btn').disabled = true;
+        document.getElementById('step-btn').innerText = 'Solved!';
+        isFinished = true;
+        
+        // Highlight found boxes
+        const boxes = document.querySelectorAll('.array-box');
+        boxes[left].classList.add('found');
+        boxes[right].classList.add('found');
+        return;
+      }
+      
+      if (left >= right) {
+        decisionText.innerText = "Pointers met or crossed. No pair found!";
+        decisionText.style.color = '#c62828';
+        document.getElementById('step-btn').disabled = true;
+        isFinished = true;
+        return;
+      }
+
+      if (currentSum < target) {
+        decisionText.innerText = `Sum (${currentSum}) < Target (${target}). Move LEFT pointer right to INCREASE sum (left++).`;
+        decisionText.style.color = 'var(--accent-color)';
+        left++;
+      } else {
+        decisionText.innerText = `Sum (${currentSum}) > Target (${target}). Move RIGHT pointer left to DECREASE sum (right--).`;
+        decisionText.style.color = '#1e90ff';
+        right--;
+      }
+      
+      renderArray();
+    }
+
+    // Initialize array visualizer
+    renderArray();
+
+    // Quiz evaluation
+    const quizAnswers = {
+      1: {
+        correctIndex: 1,
+        feedback: [
+          "Incorrect. The comparison 'left < right' works perfectly on indices regardless of values.",
+          "Correct! Because the array is sorted, we know with mathematical certainty that incrementing 'left' increases the sum, and decrementing 'right' decreases it. If the array were unsorted, moving pointers would be random and incorrect.",
+          "Incorrect. JavaScript can perform operations on any array."
+        ]
+      },
+      2: {
+        correctIndex: 2,
+        feedback: [
+          "Incorrect. Traversing elements affects time complexity, not space complexity. We do not copy the array.",
+          "Incorrect. We do not do binary splitting; we only track two scalar pointers.",
+          "Correct! We only create two scalar variables ('left' and 'right') regardless of how large the input array is. This means our extra memory footprint is O(1) constant space."
+        ]
+      }
+    };
+
+    function checkQuiz(questionId, selectedIdx, element) {
+      const qData = quizAnswers[questionId];
+      const container = element.parentElement;
+      const options = container.querySelectorAll('.quiz-option');
+      const feedbackDiv = document.getElementById(`quiz-${questionId}-feedback`);
+      
+      // Reset classes
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+      
+      // Apply class
+      if (selectedIdx === qData.correctIndex) {
+        element.classList.add('correct');
+        feedbackDiv.className = "feedback show correct-feedback";
+        feedbackDiv.innerText = qData.feedback[selectedIdx];
+      } else {
+        element.classList.add('incorrect');
+        feedbackDiv.className = "feedback show incorrect-feedback";
+        feedbackDiv.innerText = qData.feedback[selectedIdx];
+      }
+    }
+  </script>
+</body>
+</html>

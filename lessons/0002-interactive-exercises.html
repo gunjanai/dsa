@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hands-On Exercises: Lessons 1 &amp; 2</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 1.5rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 0.6rem 1.1rem;
+      cursor: pointer;
+      font-weight: 600;
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      background-color: transparent;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .tab:hover {
+      color: var(--accent-color);
+      background-color: var(--accent-light);
+    }
+    .tab.active {
+      color: var(--accent-color);
+      border-color: var(--border-color);
+      background-color: var(--bg-color);
+      margin-bottom: -2px;
+      border-bottom: 2px solid var(--bg-color);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .editor-container {
+      margin: 1.5rem 0;
+    }
+    textarea.code-area {
+      width: 100%;
+      height: 260px;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      background-color: var(--code-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem;
+      box-sizing: border-box;
+      line-height: 1.45;
+      resize: vertical;
+    }
+    .test-results {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+    }
+    .test-case {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    .test-case:last-child {
+      border-bottom: none;
+    }
+    .pass {
+      color: #2e7d32;
+      font-weight: 700;
+    }
+    .fail {
+      color: #c62828;
+      font-weight: 700;
+    }
+    .btn-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 0.8rem;
+      align-items: center;
+    }
+    .terminal-hint {
+      background: var(--code-bg);
+      border-left: 3px solid #1e90ff;
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+      background: var(--accent-light);
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.9rem;">
+      <a href="./0001-two-pointers-introduction.html">&larr; Lesson 1</a>
+      <a href="./0002-two-pointers-practice-lab.html">Lesson 2 (Visual Lab)</a>
+      <a href="../reference/two-pointers-cheatsheet.html">Cheat Sheet Reference &rarr;</a>
+    </div>
+    <h1>Coding Practice Lab: Two Pointers Foundations</h1>
+    <div class="meta">
+      <span><span class="badge">Exercises</span> 4 Hands-On Coding Challenges</span>
+      <span>Lessons 1 &amp; 2</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="terminal-hint">
+      <strong>Prefer writing code in your local editor?</strong><br>
+      These exact challenges are in the <code>exercises/</code> directory with Node test suites! Run <code>npm run test:1</code>, <code>npm run test:2</code>, etc., or write and test right here in the browser.
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('ex1')">1. Pair with Target Sum</button>
+      <button class="tab" onclick="switchTab('ex2')">2. Squaring Sorted Array</button>
+      <button class="tab" onclick="switchTab('ex3')">3. Valid Palindrome</button>
+      <button class="tab" onclick="switchTab('ex4')">4. Remove Duplicates</button>
+    </div>
+
+    <!-- EXERCISE 1 -->
+    <div id="ex1" class="tab-content active">
+      <h2>Exercise 1: Pair with Target Sum</h2>
+      <p>
+        Given a <strong>sorted</strong> array <code>nums</code> and an integer <code>target</code>, return the indices <code>[left, right]</code> of the two numbers that sum up to <code>target</code>. If no such pair exists, return <code>[-1, -1]</code>.
+      </p>
+      <div class="card">
+        <strong>Constraints &amp; Target Complexity:</strong><br>
+        Time: $O(N)$ &bull; Auxiliary Space: $O(1)$ &bull; Converging Two Pointers
+      </div>
+
+      <div class="editor-container">
+        <textarea id="code-ex1" class="code-area">function pairWithTargetSum(nums, target) {
+  let left = 0;
+  let right = nums.length - 1;
+
+  while (left < right) {
+    const currentSum = nums[left] + nums[right];
+    if (currentSum === target) {
+      return [left, right];
+    } else if (currentSum < target) {
+      left++;
+    } else {
+      right--;
+    }
+  }
+
+  return [-1, -1];
+}</textarea>
+        <div class="btn-row">
+          <button class="btn" onclick="runEx1()">Run Browser Tests</button>
+          <button class="btn btn-secondary" onclick="resetEx1()">Reset Code</button>
+          <span style="font-size:0.85rem; color:var(--text-muted);">Terminal: <code>npm run test:1</code></span>
+        </div>
+        <div class="test-results" id="res-ex1">Click "Run Browser Tests" to execute.</div>
+      </div>
+    </div>
+
+    <!-- EXERCISE 2 -->
+    <div id="ex2" class="tab-content">
+      <h2>Exercise 2: Squaring a Sorted Array</h2>
+      <p>
+        Given an integer array <code>nums</code> sorted in non-decreasing order, return an array of the squares of each number sorted in non-decreasing order.
+      </p>
+      <div class="card">
+        <strong>Constraints &amp; Target Complexity:</strong><br>
+        Time: $O(N)$ &bull; Auxiliary Space: $O(N)$ output &bull; Fill from largest squares backward
+      </div>
+
+      <div class="editor-container">
+        <textarea id="code-ex2" class="code-area">function sortedSquares(nums) {
+  const n = nums.length;
+  const result = new Array(n);
+  let left = 0;
+  let right = n - 1;
+  let writeIdx = n - 1;
+
+  while (left <= right) {
+    const leftSq = nums[left] * nums[left];
+    const rightSq = nums[right] * nums[right];
+
+    if (leftSq > rightSq) {
+      result[writeIdx] = leftSq;
+      left++;
+    } else {
+      result[writeIdx] = rightSq;
+      right--;
+    }
+    writeIdx--;
+  }
+
+  return result;
+}</textarea>
+        <div class="btn-row">
+          <button class="btn" onclick="runEx2()">Run Browser Tests</button>
+          <button class="btn btn-secondary" onclick="resetEx2()">Reset Code</button>
+          <span style="font-size:0.85rem; color:var(--text-muted);">Terminal: <code>npm run test:2</code></span>
+        </div>
+        <div class="test-results" id="res-ex2">Click "Run Browser Tests" to execute.</div>
+      </div>
+    </div>
+
+    <!-- EXERCISE 3 -->
+    <div id="ex3" class="tab-content">
+      <h2>Exercise 3: Valid Palindrome</h2>
+      <p>
+        Given a string <code>s</code>, return <code>true</code> if it is a palindrome after converting uppercase to lowercase and removing all non-alphanumeric characters.
+      </p>
+      <div class="card">
+        <strong>Constraints &amp; Target Complexity:</strong><br>
+        Time: $O(N)$ &bull; Auxiliary Space: $O(1)$ &bull; In-place two pointers skipping invalid chars
+      </div>
+
+      <div class="editor-container">
+        <textarea id="code-ex3" class="code-area">function isPalindrome(s) {
+  function isAlphaNum(c) {
+    const code = c.charCodeAt(0);
+    return (
+      (code >= 48 && code <= 57) ||
+      (code >= 65 && code <= 90) ||
+      (code >= 97 && code <= 122)
+    );
+  }
+
+  let left = 0;
+  let right = s.length - 1;
+
+  while (left < right) {
+    while (left < right && !isAlphaNum(s[left])) left++;
+    while (left < right && !isAlphaNum(s[right])) right--;
+
+    if (s[left].toLowerCase() !== s[right].toLowerCase()) {
+      return false;
+    }
+    left++;
+    right--;
+  }
+
+  return true;
+}</textarea>
+        <div class="btn-row">
+          <button class="btn" onclick="runEx3()">Run Browser Tests</button>
+          <button class="btn btn-secondary" onclick="resetEx3()">Reset Code</button>
+          <span style="font-size:0.85rem; color:var(--text-muted);">Terminal: <code>npm run test:3</code></span>
+        </div>
+        <div class="test-results" id="res-ex3">Click "Run Browser Tests" to execute.</div>
+      </div>
+    </div>
+
+    <!-- EXERCISE 4 -->
+    <div id="ex4" class="tab-content">
+      <h2>Exercise 4: Remove Duplicates from Sorted Array</h2>
+      <p>
+        Given an integer array <code>nums</code> sorted in non-decreasing order, remove duplicates <strong>in-place</strong> such that each unique element appears once. Return the number of unique elements <code>k</code>.
+      </p>
+      <div class="card">
+        <strong>Constraints &amp; Target Complexity:</strong><br>
+        Time: $O(N)$ &bull; Auxiliary Space: $O(1)$ &bull; Fast &amp; Slow Two Pointers
+      </div>
+
+      <div class="editor-container">
+        <textarea id="code-ex4" class="code-area">function removeDuplicates(nums) {
+  if (nums.length === 0) return 0;
+
+  let slow = 0;
+  for (let fast = 1; fast < nums.length; fast++) {
+    if (nums[fast] !== nums[slow]) {
+      slow++;
+      nums[slow] = nums[fast];
+    }
+  }
+
+  return slow + 1;
+}</textarea>
+        <div class="btn-row">
+          <button class="btn" onclick="runEx4()">Run Browser Tests</button>
+          <button class="btn btn-secondary" onclick="resetEx4()">Reset Code</button>
+          <span style="font-size:0.85rem; color:var(--text-muted);">Terminal: <code>npm run test:4</code></span>
+        </div>
+        <div class="test-results" id="res-ex4">Click "Run Browser Tests" to execute.</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span>DSA Patterns &bull; Exercises 1 &amp; 2</span>
+    <span><a href="./0003-triplet-sum-to-zero.html">Proceed to Lesson 3 (3Sum) &rarr;</a></span>
+  </footer>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      const tabIdx = { ex1: 0, ex2: 1, ex3: 2, ex4: 3 }[tabId];
+      document.querySelectorAll('.tab')[tabIdx].classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function renderResults(containerId, results) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = '';
+      let passedCount = 0;
+
+      results.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'test-case';
+        if (r.passed) passedCount++;
+        item.innerHTML = `
+          <span>${r.name}: <code>${r.detail}</code></span>
+          <span class="${r.passed ? 'pass' : 'fail'}">${r.passed ? '✔ PASS' : '✖ FAIL'}</span>
+        `;
+        el.appendChild(item);
+      });
+
+      const summary = document.createElement('div');
+      summary.style.marginTop = '0.8rem';
+      summary.style.fontWeight = 'bold';
+      summary.className = passedCount === results.length ? 'pass' : 'fail';
+      summary.innerText = `Result: ${passedCount} / ${results.length} tests passed.`;
+      el.appendChild(summary);
+    }
+
+    // Runner 1
+    function runEx1() {
+      try {
+        const code = document.getElementById('code-ex1').value;
+        const fn = new Function(`${code}; return pairWithTargetSum;`)();
+        const results = [
+          { name: "Standard sorted", detail: "nums=[1,2,4,6,8,10,13], target=14", passed: JSON.stringify(fn([1,2,4,6,8,10,13], 14)) === JSON.stringify([2,5]) },
+          { name: "Extreme ends", detail: "nums=[2,7,11,15], target=17", passed: JSON.stringify(fn([2,7,11,15], 17)) === JSON.stringify([0,3]) },
+          { name: "Negative elements", detail: "nums=[-10,-5,-2,0,3,7], target=-2", passed: JSON.stringify(fn([-10,-5,-2,0,3,7], -2)) === JSON.stringify([1,4]) },
+          { name: "No pair found", detail: "nums=[1,2,3,9], target=8", passed: JSON.stringify(fn([1,2,3,9], 8)) === JSON.stringify([-1,-1]) }
+        ];
+        renderResults('res-ex1', results);
+      } catch (err) {
+        document.getElementById('res-ex1').innerHTML = `<span class="fail">Syntax / Execution Error: ${err.message}</span>`;
+      }
+    }
+
+    // Runner 2
+    function runEx2() {
+      try {
+        const code = document.getElementById('code-ex2').value;
+        const fn = new Function(`${code}; return sortedSquares;`)();
+        const results = [
+          { name: "Mixed positive/negative", detail: "nums=[-4,-1,0,3,10]", passed: JSON.stringify(fn([-4,-1,0,3,10])) === JSON.stringify([0,1,9,16,100]) },
+          { name: "Duplicates after squaring", detail: "nums=[-7,-3,2,3,11]", passed: JSON.stringify(fn([-7,-3,2,3,11])) === JSON.stringify([4,9,9,49,121]) },
+          { name: "All negative", detail: "nums=[-5,-4,-3,-2,-1]", passed: JSON.stringify(fn([-5,-4,-3,-2,-1])) === JSON.stringify([1,4,9,16,25]) },
+          { name: "Single element", detail: "nums=[-3]", passed: JSON.stringify(fn([-3])) === JSON.stringify([9]) }
+        ];
+        renderResults('res-ex2', results);
+      } catch (err) {
+        document.getElementById('res-ex2').innerHTML = `<span class="fail">Syntax / Execution Error: ${err.message}</span>`;
+      }
+    }
+
+    // Runner 3
+    function runEx3() {
+      try {
+        const code = document.getElementById('code-ex3').value;
+        const fn = new Function(`${code}; return isPalindrome;`)();
+        const results = [
+          { name: "Panama sentence", detail: "'A man, a plan, a canal: Panama'", passed: fn("A man, a plan, a canal: Panama") === true },
+          { name: "Non-palindrome", detail: "'race a car'", passed: fn("race a car") === false },
+          { name: "Spaces only", detail: "'   '", passed: fn("   ") === true },
+          { name: "Numbers & letters", detail: "'0P0' vs '0P'", passed: fn("0P0") === true && fn("0P") === false }
+        ];
+        renderResults('res-ex3', results);
+      } catch (err) {
+        document.getElementById('res-ex3').innerHTML = `<span class="fail">Syntax / Execution Error: ${err.message}</span>`;
+      }
+    }
+
+    // Runner 4
+    function runEx4() {
+      try {
+        const code = document.getElementById('code-ex4').value;
+        const fn = new Function(`${code}; return removeDuplicates;`)();
+        
+        const a1 = [1, 1, 2];
+        const k1 = fn(a1);
+        const p1 = k1 === 2 && JSON.stringify(a1.slice(0, 2)) === JSON.stringify([1, 2]);
+
+        const a2 = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4];
+        const k2 = fn(a2);
+        const p2 = k2 === 5 && JSON.stringify(a2.slice(0, 5)) === JSON.stringify([0, 1, 2, 3, 4]);
+
+        const a3 = [7, 7, 7, 7];
+        const k3 = fn(a3);
+        const p3 = k3 === 1 && a3[0] === 7;
+
+        const results = [
+          { name: "Basic duplicates", detail: "nums=[1,1,2] -> k=2", passed: p1 },
+          { name: "Multiple duplicates", detail: "nums=[0,0,1,1,1,2,2,3,3,4] -> k=5", passed: p2 },
+          { name: "All same values", detail: "nums=[7,7,7,7] -> k=1", passed: p3 }
+        ];
+        renderResults('res-ex4', results);
+      } catch (err) {
+        document.getElementById('res-ex4').innerHTML = `<span class="fail">Syntax / Execution Error: ${err.message}</span>`;
+      }
+    }
+
+    function resetEx1() {
+      document.getElementById('code-ex1').value = `function pairWithTargetSum(nums, target) {\n  // TODO: implement\n  return [-1, -1];\n}`;
+    }
+    function resetEx2() {
+      document.getElementById('code-ex2').value = `function sortedSquares(nums) {\n  // TODO: implement\n  return [];\n}`;
+    }
+    function resetEx3() {
+      document.getElementById('code-ex3').value = `function isPalindrome(s) {\n  // TODO: implement\n  return false;\n}`;
+    }
+    function resetEx4() {
+      document.getElementById('code-ex4').value = `function removeDuplicates(nums) {\n  // TODO: implement\n  return 0;\n}`;
+    }
+  </script>
+</body>
+</html>
